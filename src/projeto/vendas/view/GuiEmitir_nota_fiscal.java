@@ -7,12 +7,22 @@ package projeto.vendas.view;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javax.swing.JFrame;
+import javax.swing.table.DefaultTableModel;
 import projeto.vendas.control.Conexao;
 import projeto.vendas.control.DaoGerarPedido;
+import projeto.vendas.control.DaoPFisica;
+import projeto.vendas.control.DaoPJuridica;
+import projeto.vendas.control.DaoPedidoProduto;
+import projeto.vendas.control.DaoProduto;
 import projeto.vendas.model.Pedido;
+import projeto.vendas.model.PedidoProduto;
+import projeto.vendas.model.PessoaFisica;
+import projeto.vendas.model.PessoaJuridica;
+import projeto.vendas.model.Produto;
 
 /**
  *
@@ -74,7 +84,7 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
         jPanelRemetente = new javax.swing.JPanel();
         jPanelDados_Remetente = new javax.swing.JPanel();
         lblNome_Fantasia_Remetente = new javax.swing.JLabel();
-        txtNome_Fantasia_Remetente = new javax.swing.JTextField();
+        txt_NomeDestinario = new javax.swing.JTextField();
         lblTelefone_Remetente = new javax.swing.JLabel();
         ftxtTelefone_Remetente = new javax.swing.JFormattedTextField();
         lblEmail_Remetente = new javax.swing.JLabel();
@@ -228,6 +238,8 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
 
         lblEmpresa_Emitente.setText("Empresa de Emissão");
 
+        cbxEmpresa_Emitente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pet Happy" }));
+
         lblCNPJ_Emitente.setText("CNPJ");
 
         try {
@@ -235,18 +247,34 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
+        ftxtCNPJ_Emitente.setText("50.000.000/0000-01");
 
         lblRazao_Social_Emitente.setText("Razão Social");
+
+        txtRazao_Social_Emitente.setText("Servir bem os Animais.");
 
         jPanelEndereco_Emitente.setBorder(javax.swing.BorderFactory.createTitledBorder("Endereço"));
 
         lblRua_Emitente.setText("Rua");
 
+        txtRua_Emitente.setText("Santiago Idalgo Ruiz");
+
         lblNumero_Emitente.setText("Número");
+
+        txtNumero_Emitente.setText("69");
+        txtNumero_Emitente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtNumero_EmitenteActionPerformed(evt);
+            }
+        });
 
         lblComplemento_Emitente.setText("Complemento");
 
+        txtComplemento_Emitente.setText("Não Existe");
+
         lblBairro_Emitente.setText("Bairro");
+
+        txtBairro_Emitente.setText("Jardim Maria Antonia Prado");
 
         lblCEP_Emitente.setText("CEP");
 
@@ -255,10 +283,15 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
+        ftxtCEP_Emitente.setText("18.076-120");
 
         lblCidade_Emitente.setText("Cidade");
 
+        txtCidade_Emitente.setText("Sorocaba");
+
         lblUF_Emitente.setText("UF");
+
+        txtUF_Emitente.setText("SP");
 
         javax.swing.GroupLayout jPanelEndereco_EmitenteLayout = new javax.swing.GroupLayout(jPanelEndereco_Emitente);
         jPanelEndereco_Emitente.setLayout(jPanelEndereco_EmitenteLayout);
@@ -366,7 +399,7 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanelDescricao_Nota_Fiscal.addTab("Emitente", jPanelDados_Emitente);
+        jPanelDescricao_Nota_Fiscal.addTab("Remetente", jPanelDados_Emitente);
 
         lblNome_Fantasia_Remetente.setText("Nome Fantasia");
 
@@ -479,7 +512,7 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
                     .addGroup(jPanelDados_RemetenteLayout.createSequentialGroup()
                         .addGroup(jPanelDados_RemetenteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblNome_Fantasia_Remetente)
-                            .addComponent(txtNome_Fantasia_Remetente, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txt_NomeDestinario, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(jPanelDados_RemetenteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(ftxtTelefone_Remetente, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -502,7 +535,7 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
                 .addGroup(jPanelDados_RemetenteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ftxtTelefone_Remetente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtEmail_Remetente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNome_Fantasia_Remetente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txt_NomeDestinario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jPanelEndereco_Remetente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -524,7 +557,7 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        jPanelDescricao_Nota_Fiscal.addTab("Destinatário/Remetente", jPanelRemetente);
+        jPanelDescricao_Nota_Fiscal.addTab("Destinatário", jPanelRemetente);
 
         tblProduto.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -971,6 +1004,53 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
             break;
             }
             ftxtData_Emissao.setText(pedido.getDtPedido().substring(0, pedido.getDtPedido().indexOf("-")).replace("/", ""));
+            System.out.println(pedido.getDtPedido().substring(0, pedido.getDtPedido().indexOf("-")).replace("/", ""));
+            System.out.println(pedido.getClienteCod().subSequence(0, 2));
+            
+            if(pedido.getClienteCod().contains("PF")) {
+                pessoaFisica = daoPFisica.consultar(pedido.getClienteCod());
+                txt_NomeDestinario.setText(pessoaFisica.getNome());
+                                 System.out.println(pessoaFisica.getNome());
+                ftxtTelefone_Remetente.setText(pessoaFisica.getTel());
+                                 System.out.println(pessoaFisica.getTel());
+                txtEmail_Remetente.setText(pessoaFisica.getEmail());
+                                 System.out.println(pessoaFisica.getEmail());
+                txtCidade_Remetente.setText(pessoaFisica.getCidade());
+                                 System.out.println(pessoaFisica.getCidade());
+                txtRua_Remetente.setText(pessoaFisica.getRua());
+                txtNumero_Remetente.setText(pessoaFisica.getNumero());
+                txtComplemento_Remetente.setText(pessoaFisica.getComplemento());
+                txtBairro_Remetente.setText(pessoaFisica.getBairro());
+                ftxtCEP_Remetente.setText(pessoaFisica.getCep());
+                txtCidade_Remetente.setText(pessoaFisica.getCidade());
+                txtUF_Remetente.setText(pessoaFisica.getUf());
+                
+                
+//                System.out.println(produto);
+                
+                
+              ListaPedidoProduto = daoPedidoProduto.listarPedidoProduto(pedido.getCodigo());
+              if(ListaPedidoProduto != null) {
+                  DefaultTableModel model = (DefaultTableModel) tblProduto.getModel();
+                  for(int i = 0; i < ListaPedidoProduto.size(); i++) {
+                      produto = daoProduto.consultar(ListaPedidoProduto.get(i).getProdutoCod());
+                      Object[] row = {ListaPedidoProduto.get(i).getProdutoCod(),produto.getDescricao(),
+                                      produto.getValorUnitario(),ListaPedidoProduto.get(i).getProdutoQtd(),
+                                      "Sim","Não","Outras",produto.getValorUnitario() * ListaPedidoProduto.get(i).getProdutoQtd(),
+                                       "ICMS","IPI","PIS","COFINS","CFOP"};
+                      model.addRow(row);
+                  }     
+                  
+              }
+              
+            }
+            else {
+//                pessoaJuridica = daoPJuridica.consultar.getClienteCod());
+                
+            }
+            
+            
+
         }
            GuiEmitir_nota_fiscal.this.setTitle("OIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
     }//GEN-LAST:event_btn_BuscarActionPerformed
@@ -980,7 +1060,10 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
         conexao.setDriver();
         conexao.setConnectionString();
         daoGerarPedido = new DaoGerarPedido(conexao.conectar());
-        
+        daoPJuridica = new DaoPJuridica(conexao.conectar());
+        daoPFisica = new DaoPFisica(conexao.conectar());
+        daoPedidoProduto = new DaoPedidoProduto(conexao.conectar());
+        daoProduto = new DaoProduto(conexao.conectar());
         Date data = new Date(System.currentTimeMillis());
         Calendar calendar = new GregorianCalendar();
         SimpleDateFormat formatarDate = new SimpleDateFormat("dd/MM/yyyy");
@@ -991,6 +1074,10 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
         
         
     }//GEN-LAST:event_formWindowOpened
+
+    private void txtNumero_EmitenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumero_EmitenteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNumero_EmitenteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1029,6 +1116,14 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
     
     private Conexao conexao;
     private DaoGerarPedido daoGerarPedido;
+    private DaoPFisica daoPFisica;
+    private DaoPJuridica daoPJuridica;
+    private DaoPedidoProduto daoPedidoProduto;
+    private PessoaFisica pessoaFisica;
+    private Produto produto = null;
+    private PessoaJuridica pessoaJuridica = null;
+    private ArrayList<PedidoProduto> ListaPedidoProduto;
+    private DaoProduto daoProduto;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGerar_NF;
     private javax.swing.JButton btnImprimir;
@@ -1111,7 +1206,6 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
     private javax.swing.JTextField txtComplemento_Emitente;
     private javax.swing.JTextField txtComplemento_Remetente;
     private javax.swing.JTextField txtEmail_Remetente;
-    private javax.swing.JTextField txtNome_Fantasia_Remetente;
     private javax.swing.JTextField txtNumero_Emitente;
     private javax.swing.JTextField txtNumero_Nota_Fiscal;
     private javax.swing.JTextField txtNumero_Remetente;
@@ -1128,6 +1222,7 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
     private javax.swing.JTextField txtValor_IPI;
     private javax.swing.JTextField txtValor_PIS;
     private javax.swing.JTextField txtValor_Total_Nota;
+    private javax.swing.JTextField txt_NomeDestinario;
     private javax.swing.JTextField txt_codigo;
     // End of variables declaration//GEN-END:variables
 }

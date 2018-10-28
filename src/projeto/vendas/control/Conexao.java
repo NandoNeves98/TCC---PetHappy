@@ -22,8 +22,8 @@ public class Conexao {
         this.senha = "hercules";
        */
         //conexao Luis
-        this.usuario = "BD1621028";
-        this.senha = "BD1621028";   
+        this.usuario = "fernando";
+        this.senha = "fernando98";   
    }
 
    public void setConnectionString() {
@@ -32,7 +32,7 @@ public class Conexao {
         */
         
         //setar conexao Luiz
-        this.connectionString = "jdbc:oracle:thin:@Apolo:1521:xe";
+        this.connectionString = "jdbc:oracle:thin:@localhost:1521:xe";
    }
 
    public void setDriver() {

@@ -11,7 +11,6 @@ import projeto.vendas.model.Vendedor;
 public class DaoPedidoProduto {
 
     private Connection conn;
-    private ArrayList<String> vendedores;
 
     public DaoPedidoProduto(Connection conn) {
         this.conn = conn;
@@ -31,6 +30,25 @@ public class DaoPedidoProduto {
         } catch (SQLException ex) {
             System.out.println(ex.toString());
         }
+    }
+    
+        public ArrayList<PedidoProduto> listarPedidoProduto(int codigo) {
+        ArrayList<PedidoProduto> lista = new ArrayList();
+        PedidoProduto pedidoProduto = null;
+        
+         PreparedStatement ps = null;
+            try {
+                ps = conn.prepareStatement("SELECT * from Pedido_Produto where pedidoCod = ?");
+                ps.setInt(1, codigo);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next() == true) {
+                    pedidoProduto = new PedidoProduto(rs.getInt("pedidoCod"), rs.getInt("produtoCod"), rs.getInt("qtdProduto"));
+                    lista.add(pedidoProduto);
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.toString());
+            }
+        return lista;
     }
 
 }

@@ -14,7 +14,27 @@ public class DaoProduto {
     public DaoProduto(Connection conn) {
         this.conn = conn;
     }
-
+    
+    public Produto consultar(int codigo) {
+        Produto produto = null;
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement("Select * from PRODUTO Where CODIGO = ?");
+            ps.setInt(1, codigo);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                produto = new Produto(rs.getInt("codigo"), rs.getString("descricao"),
+                                      rs.getInt("qtdEstoque"), rs.getFloat("valorUnitario"));
+            }
+            
+        }
+        catch(SQLException ex) {
+            System.out.println(ex);
+        }
+        
+        return produto;
+    }
+    
     public ArrayList<Produto> ListarProdutos() {
         Produto produto = null;
         ArrayList<Produto> lista = new ArrayList();
