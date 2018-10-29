@@ -1032,6 +1032,11 @@ public class GuiEmitir_nota_fiscal extends javax.swing.JFrame {
               ListaPedidoProduto = daoPedidoProduto.listarPedidoProduto(pedido.getCodigo());
               if(ListaPedidoProduto != null) {
                   DefaultTableModel model = (DefaultTableModel) tblProduto.getModel();
+                  int linhasTabela = model.getRowCount();
+                  for(int i = 0; i < linhasTabela; i++){
+                      model.removeRow(0);
+
+                  }
                   for(int i = 0; i < ListaPedidoProduto.size(); i++) {
                       produto = daoProduto.consultar(ListaPedidoProduto.get(i).getProdutoCod());
                       Object[] row = {ListaPedidoProduto.get(i).getProdutoCod(),produto.getDescricao(),
