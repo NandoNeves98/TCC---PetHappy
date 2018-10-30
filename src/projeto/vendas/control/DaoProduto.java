@@ -47,7 +47,6 @@ public class DaoProduto {
                                         rs.getString("DESCRICAO"),
                                         rs.getInt("qtdEstoque"),
                                         rs.getFloat("valorUnitario"));
-                System.out.println(produto);
                 lista.add(produto);
             }
         } catch (SQLException ex) {

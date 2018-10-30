@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import projeto.vendas.control.Conexao;
 import projeto.vendas.control.DaoGerarPedido;
@@ -33,6 +34,7 @@ import projeto.vendas.model.PedidoProduto;
 import projeto.vendas.model.PessoaFisica;
 import projeto.vendas.model.PessoaJuridica;
 import projeto.vendas.model.Produto;
+import projeto.vendas.model.validacoes.ValidaCNPJ;
 import projeto.vendas.model.validacoes.ValidaCPF;
 
 /**
@@ -119,6 +121,8 @@ public class GuiGerar_Pedido extends javax.swing.JFrame {
         });
 
         lbl_codigoCliente.setText("jLabel1");
+        lbl_codigoCliente.setEnabled(false);
+        lbl_codigoCliente.setOpaque(true);
 
         lbl_AvisoCPF_CNPJ.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         lbl_AvisoCPF_CNPJ.setText("kkk");
@@ -372,27 +376,6 @@ public class GuiGerar_Pedido extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnAvançarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvançarActionPerformed
-        // Produto prodt = new Produto("codigo","nome","preco","qtd");
-        Object[] row = {listaProdutos.get(cbxProduto.getSelectedIndex()).getCodigo(), cbxProduto.getSelectedItem().toString(), listaProdutos.get(cbxProduto.getSelectedIndex()).getValorUnitario(), cbxQuantidade.getValue(), ((Integer) cbxQuantidade.getValue()) * (listaProdutos.get(cbxProduto.getSelectedIndex()).getValorUnitario())};
-
-        DefaultTableModel model = (DefaultTableModel) tblProduto.getModel();
-        model.addRow(row);
-
-        Total = 0;
-        for (int i = 0; i < tblProduto.getRowCount(); i++) {
-            Total = Total + (float) model.getValueAt(i, 4);
-
-        }
-        txt_total.setText("" + Total);
-
-        PedidoProduto itemPedido = new PedidoProduto(1, listaProdutos.get(cbxProduto.getSelectedIndex()).getCodigo(), (int) cbxQuantidade.getValue());
-        pedidoProduto.add(itemPedido);
-        //Atualizando a o DISPLAY de quantidade.
-        listaProdutos.get(cbxProduto.getSelectedIndex()).setQtdEstoque(listaProdutos.get(cbxProduto.getSelectedIndex()).getQtdEstoque() - (int) cbxQuantidade.getValue());
-        lbl_QtdEstoque.setText("" + listaProdutos.get(cbxProduto.getSelectedIndex()).getQtdEstoque());
-    }//GEN-LAST:event_btnAvançarActionPerformed
-
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // nova maneira de conectar
         conexao = new Conexao();
@@ -407,8 +390,8 @@ public class GuiGerar_Pedido extends javax.swing.JFrame {
         listaProdutos = daoProduto.ListarProdutos();
         ListaPessoaFisica = daoPFisica.ListarPessoasFisicas();
         ListaPessoaJuridica = daoPJrudica.ListarPessoasJuridicas();
-        System.out.println("Vendedor = " + login.getNome());
 
+        lbl_codigoCliente.setVisible(false);
         Date data = new Date(System.currentTimeMillis());
         SimpleDateFormat formatarDate = new SimpleDateFormat("dd/MM/yyyy");
         txt_Data.setText(formatarDate.format(data));
@@ -423,40 +406,66 @@ public class GuiGerar_Pedido extends javax.swing.JFrame {
     private void btnEnviar_PedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviar_PedidoActionPerformed
 
         Calendar calendar = new GregorianCalendar();
-
-        
         String HoraSistema = calendar.get(Calendar.HOUR_OF_DAY)+ ":" + calendar.get(Calendar.MINUTE)+ ":" + calendar.get(Calendar.SECOND);
-        Pedido pedido = new Pedido(daoGerarPedido.getProximoCodigo(), lbl_codigoCliente.getText(),login.getCodigo(), txt_Data.getText() + "-" + HoraSistema, Float.parseFloat(txt_total.getText()),0);
-        daoGerarPedido.inserir(pedido);
+        
+        if (JOptionPane.showConfirmDialog(null, "Deseja efetuar o Pedido ?") == 0) {//Sim
 
-        for (int i = 0; i < pedidoProduto.size(); i++) {
-            pedidoProduto.get(i).setPedidoCod(pedido.getCodigo());
-            daoPedidoProduto.inserir(pedidoProduto.get(i));
+             Pedido pedido = new Pedido(daoGerarPedido.getProximoCodigo(), lbl_codigoCliente.getText(),login.getCodigo(), txt_Data.getText() + "-" + HoraSistema, Float.parseFloat(txt_total.getText()),0);
+             daoGerarPedido.inserir(pedido);
+            for (int i = 0; i < pedidoProduto.size(); i++) {
+                pedidoProduto.get(i).setPedidoCod(pedido.getCodigo());
+                daoPedidoProduto.inserir(pedidoProduto.get(i));
+            }
+            JOptionPane.showMessageDialog(null, "Pedido registrado com Sucesso!");
+                btnAvançar.setEnabled(false);
+                cbxProduto.setEnabled(false);
+                cbxQuantidade.setEnabled(false);
+                btnEnviar_Pedido.setEnabled(false);
+                btn_consultar.setEnabled(true);
+                txtCPF_CNPJ.setEnabled(true);
+                txt_total.setText("0.00");
+                tblProduto.removeAll();
+                txtCPF_CNPJ.requestFocus();
+                int limite = tblProduto.getModel().getRowCount();
+                DefaultTableModel model = (DefaultTableModel) tblProduto.getModel();
+                for(int i = 0; i < limite; i++)
+                    model.removeRow(0);
+                
         }
+        
     }//GEN-LAST:event_btnEnviar_PedidoActionPerformed
 
     private void btn_consultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_consultarActionPerformed
         if (txtCPF_CNPJ.getText().length() == 11) {
             pessoaFisica = daoPFisica.consultaCPF(txtCPF_CNPJ.getText());
-            if (pessoaFisica == null) {
-                lbl_AvisoCPF_CNPJ.setText("Cliente não Cadastrado");
+            if (pessoaFisica == null && ValidaCPF.validaCpf(txtCPF_CNPJ.getText()) == true) {
+                JOptionPane.showMessageDialog(null, "Cliente Não Cadastrado");
+//                lbl_AvisoCPF_CNPJ.setText("Cliente não Cadastrado");
             }
-            txt_nomeCliente.setText(pessoaFisica.getNome());
-            lbl_codigoCliente.setText(pessoaFisica.getCodigo());
-            btnAvançar.setEnabled(true);
-            cbxProduto.setEnabled(true);
-            cbxQuantidade.setEnabled(true);
-            btnEnviar_Pedido.setEnabled(true);
-            btn_consultar.setEnabled(false);
-            txtCPF_CNPJ.setEnabled(false);
-            lbl_AvisoCPF_CNPJ.setText("Cliente Localizado");
+            else {
+                lbl_AvisoCPF_CNPJ.setText("CPF Inválido");
+            }
+            if (pessoaFisica != null) {
+                cbxQuantidade.requestFocus();
+                txt_nomeCliente.setText(pessoaFisica.getNome());
+                lbl_codigoCliente.setText(pessoaFisica.getCodigo());
+                btnAvançar.setEnabled(true);
+                cbxProduto.setEnabled(true);
+                cbxQuantidade.setEnabled(true);
+                btnEnviar_Pedido.setEnabled(true);
+                btn_consultar.setEnabled(false);
+                txtCPF_CNPJ.setEnabled(false);
+                lbl_AvisoCPF_CNPJ.setText("Cliente Localizado");   
+            }
 
         } else if (txtCPF_CNPJ.getText().length() == 14) {
             pessoaJuridica = daoPJrudica.consultaCNPJ(txtCPF_CNPJ.getText());
-            if (pessoaJuridica == null) {
-                lbl_AvisoCPF_CNPJ.setText("Cliente não Cadastrado");
-
+            if (pessoaJuridica == null && ValidaCNPJ.validaCnpj(txtCPF_CNPJ.getText()) == true) {
+                JOptionPane.showMessageDialog(null, "Cliente Não Cadastrado");
             }
+            else {
+                lbl_AvisoCPF_CNPJ.setText("CNPJ Inválido");
+            } 
             txt_nomeCliente.setText(pessoaJuridica.getNome());
             lbl_codigoCliente.setText(pessoaJuridica.getCodigo());
             btnAvançar.setEnabled(true);
@@ -471,8 +480,14 @@ public class GuiGerar_Pedido extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_consultarActionPerformed
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
-        System.out.println(ValidaCPF.validaCpf("39010951871"));
-                  System.out.println(daoGerarPedido.getProximoCodigo());
+                int limite = tblProduto.getModel().getRowCount();
+                System.out.println(limite);
+                DefaultTableModel model = (DefaultTableModel) tblProduto.getModel();
+                for(int i = 0; i < limite; i++){
+                    model.removeRow(0);
+                    System.out.println(i);
+
+                }
     }//GEN-LAST:event_btnVoltarActionPerformed
 
     private void tblProdutoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tblProdutoKeyPressed
@@ -510,6 +525,35 @@ public class GuiGerar_Pedido extends javax.swing.JFrame {
     private void cbxProdutoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbxProdutoItemStateChanged
         lbl_QtdEstoque.setText("" + listaProdutos.get(cbxProduto.getSelectedIndex()).getQtdEstoque());
     }//GEN-LAST:event_cbxProdutoItemStateChanged
+
+    private void btnAvançarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvançarActionPerformed
+        if(((int) cbxQuantidade.getValue()) <= 0) {
+            JOptionPane.showMessageDialog(null,"Por Favor, insira uma quantidade válida, maior que 0.","Erro Crítico",JOptionPane.ERROR_MESSAGE);
+        }
+        if(((int) cbxQuantidade.getValue()) > listaProdutos.get(cbxProduto.getSelectedIndex()).getQtdEstoque()) {
+            JOptionPane.showMessageDialog(null,"Quantidade informada maior que a quantidade do produto em estoque.","Erro Crítico",JOptionPane.ERROR_MESSAGE);
+        }
+        else if ((((int) cbxQuantidade.getValue()) > 0 && ((int) cbxQuantidade.getValue()) <= listaProdutos.get(cbxProduto.getSelectedIndex()).getQtdEstoque())){
+            Object[] row = {listaProdutos.get(cbxProduto.getSelectedIndex()).getCodigo(), cbxProduto.getSelectedItem().toString(), listaProdutos.get(cbxProduto.getSelectedIndex()).getValorUnitario(), cbxQuantidade.getValue(), ((Integer) cbxQuantidade.getValue()) * (listaProdutos.get(cbxProduto.getSelectedIndex()).getValorUnitario())};
+
+        DefaultTableModel model = (DefaultTableModel) tblProduto.getModel();
+        model.addRow(row);
+
+        Total = 0;
+        for (int i = 0; i < tblProduto.getRowCount(); i++) {
+            Total = Total + (float) model.getValueAt(i, 4);
+
+        }
+        txt_total.setText("" + Total);
+
+        PedidoProduto itemPedido = new PedidoProduto(1, listaProdutos.get(cbxProduto.getSelectedIndex()).getCodigo(), (int) cbxQuantidade.getValue());
+        pedidoProduto.add(itemPedido);
+        //Atualizando a o DISPLAY de quantidade.
+        listaProdutos.get(cbxProduto.getSelectedIndex()).setQtdEstoque(listaProdutos.get(cbxProduto.getSelectedIndex()).getQtdEstoque() - (int) cbxQuantidade.getValue());
+        lbl_QtdEstoque.setText("" + listaProdutos.get(cbxProduto.getSelectedIndex()).getQtdEstoque());
+        }
+        
+    }//GEN-LAST:event_btnAvançarActionPerformed
 
     /**
      * @param args the command line arguments

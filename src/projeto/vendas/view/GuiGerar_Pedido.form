@@ -176,6 +176,8 @@
         <Component class="javax.swing.JLabel" name="lbl_codigoCliente">
           <Properties>
             <Property name="text" type="java.lang.String" value="jLabel1"/>
+            <Property name="enabled" type="boolean" value="false"/>
+            <Property name="opaque" type="boolean" value="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="lbl_AvisoCPF_CNPJ">
